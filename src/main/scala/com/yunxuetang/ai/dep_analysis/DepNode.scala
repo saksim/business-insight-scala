@@ -331,9 +331,10 @@ case class DepNode(var id: Int,
     }
   }
 
-  def mergeNeighbourNX(): Option[DepNode] = {
+  /// 合并相邻的NX(英文单词)
+  def mergeNeighbourNX: Option[DepNode] = {
 
-    def _merge(root:DepNode): Unit = {
+    def _merge(root: DepNode): Unit = {
       val nodeMap = root.collect_nodes().map(x => x.id -> x).toMap
       val nextNode = nodeMap.find {
         case (_, node) if node.postag != "nx" || node.deprel == "HED" => false
@@ -342,7 +343,7 @@ case class DepNode(var id: Int,
       }.map(_._2)
 
       for (n <- nextNode) {
-        for (p <- n.findById(n.id - 1)) {
+        for (p <- nodeMap.get(n.id - 1)) {
           n.children = n.children.filterNot(_.id == p.id)
           p.children = p.children.filterNot(_.id == n.id)
           val newWord = p.word + " " + n.word
@@ -366,6 +367,29 @@ case class DepNode(var id: Int,
       n.compactId()
       _merge(n)
       n
+    }
+  }
+
+  def reform_for_nx():Unit = {
+    val dict = collect_nodes().map(x => x.id -> x).toMap
+    val subCoo = dict.find {
+      case (nid, node) if node.postag == "nx" && node.deprel == "COO" =>
+        dict.get(nid - 1).exists(_.word == "､") &&
+          dict.get(nid - 2).exists(x => x.postag == "nx" && x.children.find(_.id == nid).empty)
+      case _ => false
+    }.map(_._2)
+
+    for (n <- subCoo) {
+      for (p <- dict.get(n.id - 2)) {
+        if (p.ancestors.exists(_.id == n.id)) {
+          p.detachFromParent()
+          n.addChild(p)
+        } else {
+          n.detachFromParent()
+          p.addChild(n)
+        }
+        reform_for_nx()
+      }
     }
   }
 
@@ -396,7 +420,9 @@ object DepNode {
       node
     }
     val roots = nodes2.filter(_.parent.isEmpty)
-    roots.flatMap(_.mergeNeighbourNX())
+    val roots2 = roots.flatMap(_.mergeNeighbourNX)
+    roots2.foreach(_.reform_for_nx())
+    roots2
   }
 
   def isAscii(ch: Char): Boolean = ch.toInt < 128
