@@ -41,7 +41,7 @@ object DepParser {
 
   def parse(text: String): Seq[DepNode] = {
     val sentence = HanLP.parseDependency(text)
-//    val sentence = MaxEntDependencyParser.compute(text)
+    //    val sentence = MaxEntDependencyParser.compute(text)
     DepNode.buildDepTrees(sentence.asScala.map(createAttr).toList)
   }
 

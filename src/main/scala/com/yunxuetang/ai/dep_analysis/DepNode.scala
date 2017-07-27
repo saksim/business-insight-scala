@@ -15,6 +15,85 @@ case class DepNode(var id: Int,
 
   import DepNode.choose
 
+
+  def compactId(): Unit = {
+    val nodes = collect_nodes().sortBy(_.id)
+    val dict = nodes.map(_.id).zipWithIndex.toMap
+    for (n <- nodes) {
+      n.id = dict(n.id)
+    }
+
+    def _adjust(node: DepNode): Unit = {
+      node.children.foreach(_adjust)
+      for (c <- node.children) {
+        c.parent = Some(node)
+      }
+    }
+
+    _adjust(this)
+  }
+
+  def removeSpaceWP: Option[DepNode] = (deprel, word) match {
+    case ("WP", " ") => None
+    case _ => Some(copyWithChildren(children.flatMap(_.removeSpaceWP.toSeq)))
+  }
+
+  def mergeNx: Option[DepNode] = {
+
+    def _mergeNx(root: DepNode): Unit = {
+      val nodes = root.collect_nodes().map(x => x.id -> x).toMap
+//      root.show()
+//      nodes.foreach {
+//        case (id, x) => println(s"${x.id} -> ${x.parent.map(_.id)}")
+//      }
+      //      for ((k,v) <- nodes) {
+      //        println(s"$k -> ${v.word}")
+      //      }
+      val toMergeNode = nodes.find {
+        case (_, node) if node.postag != "nx" || node.deprel == "HED" => false
+        case (id, _) if nodes.contains(id - 1) => nodes(id - 1).postag == "nx"
+        case _ => false
+      }.map(_._2)
+
+      println(s"will merge ${toMergeNode.map(_.id)}:${toMergeNode.map(_.word)} ::: ${toMergeNode.flatMap(_.parent.map(_.id))}")
+      for (n <- toMergeNode) {
+        val p = nodes(n.id - 1)
+        n.children = n.children.filterNot(_.id == p.id)
+        p.children = p.children.filterNot(_.id == n.id)
+        val iAmParent = n.parent.map(_.id == p.id).getOrElse(false)
+        val newWord = p.word + " " + n.word
+        if (iAmParent) {
+          n.children = n.children.filterNot(_.id != p.id) ++ p.children
+          n.word = newWord
+        } else {
+          n.parent.foreach(_.removeChild(p.id))
+          p.word = newWord
+          n.children.foreach(p.addChild(_))
+          println(p)
+        }
+        println(s"---------------------- ${p.word}")
+      }
+
+      root.compactId()
+      println(s"bbbbbbbbbbbb")
+      root.show()
+
+      //      if (toMergeNode.nonEmpty) {
+      //        _mergeNx(compactedRoot)
+      //      }
+    }
+
+
+    for (n <- removeSpaceWP) yield {
+      n.compactId()
+      n.collect_nodes().foreach { o =>
+        println(s"${o.id} -> ${o.parent.map(_.id)}")
+      }
+      _mergeNx(n)
+      n
+    }
+  }
+
   def copyWithChildren(newChildren: List[DepNode]): DepNode = {
     val me = copy(children = newChildren)
     for (c <- children) {
@@ -26,6 +105,11 @@ case class DepNode(var id: Int,
   def addChild(c: DepNode): DepNode = {
     children = c :: children
     c.parent = Some(this)
+    this
+  }
+
+  def removeChild(id: Int): DepNode = {
+    children = children.filterNot(_.id == id)
     this
   }
 
@@ -317,7 +401,8 @@ object DepNode {
       }
       node
     }
-    nodes2.filter(_.parent.isEmpty)
+    val roots = nodes2.filter(_.parent.isEmpty)
+    roots.flatMap(_.mergeNx)
   }
 
   def isAscii(ch: Char): Boolean = ch.toInt < 128
