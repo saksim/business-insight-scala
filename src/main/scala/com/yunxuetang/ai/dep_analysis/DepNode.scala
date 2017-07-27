@@ -19,7 +19,7 @@ case class DepNode(var id: Int,
     parent.map(_.root).getOrElse(this)
   }
 
-  def ancestors:Seq[DepNode] = parent.toSeq.flatMap(_.ancestors)
+  def ancestors: Seq[DepNode] = parent.toSeq.flatMap(_.ancestors)
 
   def findById(nodeId: Int): Option[DepNode] = {
     root.collect_nodes().find(_.id == nodeId)
@@ -46,49 +46,6 @@ case class DepNode(var id: Int,
     case _ => Some(copyWithChildren(children.flatMap(_.trimSpaceWP.toSeq)))
   }
 
-  def mergeNeighbourNX(): Option[DepNode] = {
-
-    def _merge(root: DepNode): Unit = {
-      val nodes = root.collect_nodes().map(x => x.id -> x).toMap
-      val toMergeNode = nodes.find {
-        case (_, node) if node.postag != "nx" || node.deprel == "HED" => false
-        case (nid, _) if !nodes.contains(nid - 1) => false
-        case (nid, _) => nodes(nid - 1).postag == "nx"
-      }.map(_._2)
-
-      for (n <- toMergeNode) {
-        for (p <- n.findById(n.id - 1)) {
-          n.children = n.children.filterNot(_.id == p.id)
-          p.children = p.children.filterNot(_.id == n.id)
-          val nIsParent = p.parent.map(_.id == n.id).getOrElse(false)
-          val newWord = p.word + " " + n.word
-          if (nIsParent) {
-            n.children = n.children.filterNot(_.id != p.id) ++ p.children
-            n.word = newWord
-          } else {
-            n.parent.foreach(_.removeChild(n.id))
-            p.word = newWord
-            n.children.foreach(p.addChild(_))
-            p.show()
-          }
-        }
-      }
-
-      root._correctParent()
-      root.compactId()
-      if (toMergeNode.nonEmpty) {
-        _merge(root)
-      }
-    }
-
-
-    for (n <- trimSpaceWP) yield {
-      n.compactId()
-      _merge(n)
-      n
-    }
-  }
-
   def copyWithChildren(newChildren: List[DepNode]): DepNode = {
     val me = copy(children = newChildren)
     for (c <- children) {
@@ -108,8 +65,7 @@ case class DepNode(var id: Int,
     this
   }
 
-
-  def removeRedundantCC: Option[DepNode] = {
+  def trimRedundantCC: Option[DepNode] = {
     val allIds = collect_nodes().map(_.id).toSet
 
     def nonExists(id: Int): Boolean = !allIds.contains(id)
@@ -126,7 +82,7 @@ case class DepNode(var id: Int,
         case (_, "w") if nonExists(n.id - 1) || nonExists(n.id + 1) =>
           cs
         case _ =>
-          Seq(n.copy(children = cs))
+          Seq(n.copyWithChildren(cs))
       }
     }
 
@@ -218,25 +174,25 @@ case class DepNode(var id: Int,
   def reform_for_vob_subject: Option[DepNode] = {
     val nonVOBs = children.filter(x => x.isLevelAtt || x.deprel != "VOB")
     val VOBs = children.filter(_.deprel == "VOB").map { x =>
-      x.copy(children = x.children.flatMap(_.trimLevelAtt))
+      x.copyWithChildren(x.children.flatMap(_.trimLevelAtt))
     }
-    copy(children = nonVOBs ++ VOBs).some
+    copyWithChildren(nonVOBs ++ VOBs).some
   }
 
   def reform_for_cmp_subject: Option[DepNode] = {
-    copy(children = children.filter(_.isNonLevelAtt)).some
+    copyWithChildren(children.filter(_.isNonLevelAtt)).some
   }
 
   def reform_for_sbv_subject: Option[DepNode] = {
-    copy(children = children.filter(_.isNonLevelAtt)).some
+    copyWithChildren(children.filter(_.isNonLevelAtt)).some
   }
 
   def reform_for_noun_subject: Option[DepNode] = {
-    copy(children = children.filter(_.isNonLevelAtt)).some
+    copyWithChildren(children.filter(_.isNonLevelAtt)).some
   }
 
   def reform_for_subject: DepNode = {
-    copy(children = children.filter(x => x.deprel != "ATT" || x.postag != "d"))
+    copyWithChildren(children.filter(x => x.deprel != "ATT" || x.postag != "d"))
   }
 
   def level: Option[String] = {
@@ -278,9 +234,9 @@ case class DepNode(var id: Int,
   def reform_for_vob_level: Option[DepNode] = {
     List(
       children.filter(_.isLevelAtt),
-      if (isYou) Seq() else Seq(copy(children = Nil)),
-      children.filter(_.deprel == "VOB").map(_.children.filter(_.isLevelAtt)).flatten,
-      Seq(copy(children = Nil))
+      if (isYou) Seq() else Seq(copyWithChildren(Nil)),
+      children.filter(_.deprel == "VOB").flatMap(_.children.filter(_.isLevelAtt)),
+      Seq(copyWithChildren(Nil))
     ).flatten.headOption
   }
 
@@ -293,14 +249,14 @@ case class DepNode(var id: Int,
   def reform_for_sbv_level: Option[DepNode] = {
     List(
       children.filter(_.isLevelAtt),
-      Seq(copy(children = Nil))
+      Seq(copyWithChildren(Nil))
     ).flatten.headOption
   }
 
   def reform_for_cmp_level: Option[DepNode] = {
     Seq(
       children.filter(_.deprel == "CMP"),
-      Seq(copy(children = Nil))
+      Seq(copyWithChildren(Nil))
     ).flatten.headOption
   }
 
@@ -326,7 +282,7 @@ case class DepNode(var id: Int,
         true
       } else {
         (p.deprel, p.postag, postag) match {
-          case (_, _, postag) if isNounPosTag(postag) => true
+          case (_, _, ptag) if isNounPosTag(ptag) => true
           case (_, _, "vyou") => true
           case _ => false
         }
@@ -335,11 +291,11 @@ case class DepNode(var id: Int,
       false
   }
 
-  def split_coo(): List[DepNode] = _split().flatMap(_.removeRedundantCC)
+  def split_coo(): List[DepNode] = _split().flatMap(_.trimRedundantCC)
 
   private def _split(): List[DepNode] = {
     if (children.isEmpty) {
-      List(copy())
+      List(copyWithChildren(Nil))
     } else {
       val (cooSeq, nonCooChildren) = children.partition(_.isSplitableCoo)
       val childrenSeq = choose(nonCooChildren.map(_._split()))
@@ -369,6 +325,49 @@ case class DepNode(var id: Int,
       Some(copyWithChildren(children.flatMap(_.reform)))
   }
 
+  def detachFromParent(): Unit = {
+    for (p <- parent) {
+      p.children = p.children.filterNot(_.id == id)
+    }
+  }
+
+  def mergeNeighbourNX(): Option[DepNode] = {
+
+    def _merge(root:DepNode): Unit = {
+      val nodeMap = root.collect_nodes().map(x => x.id -> x).toMap
+      val nextNode = nodeMap.find {
+        case (_, node) if node.postag != "nx" || node.deprel == "HED" => false
+        case (nid, _) if !nodeMap.contains(nid - 1) => false
+        case (nid, _) => nodeMap(nid - 1).postag == "nx"
+      }.map(_._2)
+
+      for (n <- nextNode) {
+        for (p <- n.findById(n.id - 1)) {
+          n.children = n.children.filterNot(_.id == p.id)
+          p.children = p.children.filterNot(_.id == n.id)
+          val newWord = p.word + " " + n.word
+          if (p.ancestors.exists(_.id == n.id)) {
+            p.detachFromParent()
+            n.word = newWord
+            p.children.foreach(n.addChild)
+          } else {
+            n.detachFromParent()
+            p.word = newWord
+            n.children.foreach(p.addChild)
+          }
+          root._correctParent()
+          root.compactId()
+          _merge(root)
+        }
+      }
+    }
+
+    for (n <- trimSpaceWP) yield {
+      n.compactId()
+      _merge(n)
+      n
+    }
+  }
 
 }
 
@@ -397,7 +396,7 @@ object DepNode {
       node
     }
     val roots = nodes2.filter(_.parent.isEmpty)
-    roots.flatMap(_.mergeNeighbourNX)
+    roots.flatMap(_.mergeNeighbourNX())
   }
 
   def isAscii(ch: Char): Boolean = ch.toInt < 128
