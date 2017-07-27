@@ -15,23 +15,15 @@ case class DepNode(var id: Int,
 
   import DepNode.choose
 
-  def root(): DepNode = {
-    parent.map(_.root()).getOrElse(this)
+  def root: DepNode = {
+    parent.map(_.root).getOrElse(this)
   }
 
-  def findById(ID: Int): Option[DepNode] = {
+  def ancestors:Seq[DepNode] = parent.toSeq.flatMap(_.ancestors)
 
-    def _find(n: DepNode): Option[DepNode] = {
-      if (n.id == ID) {
-        Some(n)
-      } else {
-        n.children.flatMap(_find(_)).headOption
-      }
-    }
-
-    _find(this.root())
+  def findById(nodeId: Int): Option[DepNode] = {
+    root.collect_nodes().find(_.id == nodeId)
   }
-
 
   def compactId(): Unit = {
     val nodes = collect_nodes().sortBy(_.id)
@@ -39,31 +31,29 @@ case class DepNode(var id: Int,
     for (n <- nodes) {
       n.id = dict(n.id)
     }
-
-
-    this._adjust()
+    this._correctParent()
   }
 
-  def _adjust(): Unit = {
-    children.foreach(_._adjust)
+  def _correctParent(): Unit = {
+    children.foreach(_._correctParent())
     for (c <- children) {
-      c.parent = Some(this)
+      c.parent = this.some
     }
   }
 
-  def removeSpaceWP: Option[DepNode] = (deprel, word) match {
+  def trimSpaceWP: Option[DepNode] = (deprel, word) match {
     case ("WP", " ") => None
-    case _ => Some(copyWithChildren(children.flatMap(_.removeSpaceWP.toSeq)))
+    case _ => Some(copyWithChildren(children.flatMap(_.trimSpaceWP.toSeq)))
   }
 
-  def mergeNx: Option[DepNode] = {
+  def mergeNeighbourNX(): Option[DepNode] = {
 
-    def _mergeNx(root: DepNode): Unit = {
+    def _merge(root: DepNode): Unit = {
       val nodes = root.collect_nodes().map(x => x.id -> x).toMap
       val toMergeNode = nodes.find {
         case (_, node) if node.postag != "nx" || node.deprel == "HED" => false
-        case (id, _) if nodes.contains(id - 1) => nodes(id - 1).postag == "nx"
-        case _ => false
+        case (nid, _) if !nodes.contains(nid - 1) => false
+        case (nid, _) => nodes(nid - 1).postag == "nx"
       }.map(_._2)
 
       for (n <- toMergeNode) {
@@ -84,17 +74,17 @@ case class DepNode(var id: Int,
         }
       }
 
-      root._adjust()
+      root._correctParent()
       root.compactId()
       if (toMergeNode.nonEmpty) {
-        _mergeNx(root)
+        _merge(root)
       }
     }
 
 
-    for (n <- removeSpaceWP) yield {
+    for (n <- trimSpaceWP) yield {
       n.compactId()
-      _mergeNx(n)
+      _merge(n)
       n
     }
   }
@@ -407,7 +397,7 @@ object DepNode {
       node
     }
     val roots = nodes2.filter(_.parent.isEmpty)
-    roots.flatMap(_.mergeNx)
+    roots.flatMap(_.mergeNeighbourNX)
   }
 
   def isAscii(ch: Char): Boolean = ch.toInt < 128
