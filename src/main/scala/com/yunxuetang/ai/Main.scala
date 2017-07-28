@@ -46,7 +46,11 @@ object Main {
     //    "有团队合作精神"
     //    "熟悉大数据处理架构"
 //    "对大数据技术体系､关键技术､发展趋势有深刻的理解和认识"
-    "能够独立搭建LINUX开发环境,如MYSQL、PHP、APACHE等常用软件"
+//    "能够独立搭建LINUX开发环境,如MYSQL、PHP、APACHE等常用软件"
+//    "团队打造能力､沟通能力､良好的执行力及职业化素养"
+//    "熟练使用SEO优化各种工具和技术"
+//    "阅读和理解能力强"
+    "熟悉掌握C､C++语言编程"
   ).zipWithIndex.map {
     case (text, index) =>
       val id = index.toLong + 1L
@@ -76,8 +80,8 @@ object Main {
   def main(args: Array[String]): Unit = {
     loadCustomDictionary()
     //    printItems()
-        procDb()
-//    showAbilities()
+//        procDb()
+    showAbilities()
   }
 
 }

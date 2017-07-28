@@ -176,13 +176,15 @@ case class DepNode(var id: Int,
 
   def isVOB: Boolean = children.exists(_.deprel == "VOB")
 
+  def isFOB: Boolean = children.exists(_.deprel == "FOB")
+
   def isSBV: Boolean = children.exists(_.deprel == "SBV")
 
   def isCMP: Boolean = children.exists(_.deprel == "CMP")
 
   def isSbvVob: Boolean = isVOB && isSBV
 
-  def isClause:Boolean = isVOB || isSBV
+  def isClause:Boolean = isVOB || isSBV || isFOB
 
   def isYou: Boolean = postag == "vyou" || MasterVerbSet.contains(word)
 
