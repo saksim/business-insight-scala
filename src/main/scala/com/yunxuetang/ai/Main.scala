@@ -46,7 +46,7 @@ object Main {
 
     //    println(HanLP.extractPhrase("具有较强的分析能力和项目管理能力", 5))
 
-    val slices = cutIntoSlice((100L, 200L), 100L)
+    val slices = cutIntoSlice((0L, 3000L), 100L)
     slices.map { case (beg, end) =>
       //      val f = getReqItem(beg, end).flatMap(sinkAbility)
       val f = getReqItem(beg, end).map(_.map(abilitiesOf))
