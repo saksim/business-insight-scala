@@ -15,7 +15,17 @@ package object ability {
     "开发",
     "流程",
     "工作",
-    "原理"
+    "原理",
+    "技术",
+    "特性",
+    "工具",
+    "技术",
+    "产品"
+  )
+
+  val NonBranchClauseBeginWords = Set(
+    "如",
+    "例如"
   )
 
   def isGeneralAbility(node:DepNode) :Boolean = {

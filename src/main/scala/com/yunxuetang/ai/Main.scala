@@ -36,10 +36,17 @@ object Main {
     //    "熟悉AIX､SOLARIS､LINUX任一操作系统",
     //    "熟悉发动机开发流程及工作原理",
     //    "精通HTML5､CSS3､JAVASCRIPT等WEB前端开发技术",
-    //      "优秀的沟通与表达能力"
+    //    "优秀的沟通与表达能力"
     //    "计划､组织､沟通､协调能力强"
     //    "熟悉HADOOP、HIVE、STORM 等相关环境和工作原理"
-    "熟练使用至少一种常用统计工具:SAS､R､PYTHON､SQL等"
+    //    "熟练使用至少一种常用统计工具:SAS､R､PYTHON､SQL等"
+    //    "责任心强､具备团队合作精神"
+    //    "熟知各大搜索引擎的排名原理和技术特性"
+    //    "熟悉MICROSOFT OFFICE系列"
+    //    "有团队合作精神"
+    //    "熟悉大数据处理架构"
+//    "对大数据技术体系､关键技术､发展趋势有深刻的理解和认识"
+    "能够独立搭建LINUX开发环境,如MYSQL、PHP、APACHE等常用软件"
   ).zipWithIndex.map {
     case (text, index) =>
       val id = index.toLong + 1L
@@ -68,9 +75,9 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     loadCustomDictionary()
-//    printItems()
-//    procDb()
-    showAbilities()
+    //    printItems()
+        procDb()
+//    showAbilities()
   }
 
 }

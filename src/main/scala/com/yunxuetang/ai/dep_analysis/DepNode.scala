@@ -1,6 +1,7 @@
 package com.yunxuetang.ai.dep_analysis
 
 import com.yunxuetang.ai.ability.MasterVerbSet
+import com.yunxuetang.ai.ability.NonBranchClauseBeginWords
 import com.yunxuetang.ai.{ability, hanlp}
 import com.yunxuetang.ai.hanlp.isNounPosTag
 
@@ -181,6 +182,8 @@ case class DepNode(var id: Int,
 
   def isSbvVob: Boolean = isVOB && isSBV
 
+  def isClause:Boolean = isVOB || isSBV
+
   def isYou: Boolean = postag == "vyou" || MasterVerbSet.contains(word)
 
 
@@ -287,10 +290,16 @@ case class DepNode(var id: Int,
 
   def isSplitableCoo: Boolean = (parent, deprel) match {
     case (Some(p), "COO") =>
-      if (p.deprel == "ATT" && p.isVerb && isVerb) {
+      if (postag == "nx" && p.deprel == "HED") {
         false
-        //      } else if (p.deprel) {
-
+      } else if (p.deprel == "HED" && children.empty) {
+          false
+      } else if (p.deprel == "HED" && NonBranchClauseBeginWords.contains(word)) {
+        false
+      } else if (p.isClause && isClause) {
+        true
+      } else if (p.deprel == "ATT" && p.isVerb && isVerb) {
+        false
       } else if (isSubOf(List("VOB", "SBV"))) {
         true
       } else {
