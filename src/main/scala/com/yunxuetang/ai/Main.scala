@@ -50,7 +50,8 @@ object Main {
 //    "团队打造能力､沟通能力､良好的执行力及职业化素养"
 //    "熟练使用SEO优化各种工具和技术"
 //    "阅读和理解能力强"
-    "熟悉掌握C､C++语言编程"
+//    "熟悉掌握C､C++语言编程"
+    "具备JAVA WEB､数据库开发基础者优先"
   ).zipWithIndex.map {
     case (text, index) =>
       val id = index.toLong + 1L

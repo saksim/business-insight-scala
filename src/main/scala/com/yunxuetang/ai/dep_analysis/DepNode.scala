@@ -67,7 +67,7 @@ case class DepNode(var id: Int,
   }
 
   def addChildren(cs: Seq[DepNode]): Boolean = {
-    cs.map(addChild).forall(_==true)
+    cs.map(addChild).forall(_ == true)
   }
 
   def removeChild(id: Int): DepNode = {
@@ -184,7 +184,7 @@ case class DepNode(var id: Int,
 
   def isSbvVob: Boolean = isVOB && isSBV
 
-  def isClause:Boolean = isVOB || isSBV || isFOB
+  def isClause: Boolean = isVOB || isSBV || isFOB
 
   def isYou: Boolean = postag == "vyou" || MasterVerbSet.contains(word)
 
@@ -295,7 +295,7 @@ case class DepNode(var id: Int,
       if (postag == "nx" && p.deprel == "HED") {
         false
       } else if (p.deprel == "HED" && children.empty) {
-          false
+        false
       } else if (p.deprel == "HED" && NonBranchClauseBeginWords.contains(word)) {
         false
       } else if (p.isClause && isClause) {
@@ -315,7 +315,25 @@ case class DepNode(var id: Int,
       false
   }
 
-  def split_coo(): List[DepNode] = _split().flatMap(_.trimRedundantCC)
+  def split_coo(): Seq[DepNode] = {
+    for {
+      branch <- split_multi_vob
+      coo <- branch._split()
+      x <- coo.trimRedundantCC
+    } yield x
+  }
+
+  private def split_multi_vob: Seq[DepNode] = {
+    val vobs = children.filter(_.deprel == "VOB")
+    for (elem <- vobs) {
+      elem.detach()
+    }
+    vobs.map { x =>
+      val cp = deepCopy
+      cp.addChild(x)
+      cp
+    }
+  }
 
   private def _split(): List[DepNode] = {
     if (children.isEmpty) {
