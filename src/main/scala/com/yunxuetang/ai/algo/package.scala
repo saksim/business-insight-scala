@@ -23,4 +23,5 @@ package object algo {
     _cutIntoSlice(r, Nil)
   }
 
+
 }

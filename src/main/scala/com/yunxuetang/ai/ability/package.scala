@@ -45,9 +45,9 @@ package object ability {
 
     val branches = roots.flatMap(_.split_coo())
 
-    for (elem <- branches) {
-      elem.show()
-    }
+//    for (elem <- branches) {
+//      elem.show()
+//    }
 
     val abilities = branches.flatMap(abilityOf(item, _)).filterNot(_.entity.endsWith("例如"))
     showAbilities(item, abilities)
@@ -55,11 +55,11 @@ package object ability {
   }
 
   def showAbilities(item: JobReqItem, abilities: Seq[JobAbility]): Unit = {
-    println(s"[${item.id.get}] ${item.item}")
+    println(s"[${item.id.get}]${item.item}")
     for (ab <- abilities) {
-      println(s"\t${ab.entity}:${ab.level}")
+      println(s"\t\t${ab.entity}:${ab.level}")
     }
-
+    println("-"*120)
   }
 
 

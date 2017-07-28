@@ -385,9 +385,9 @@ case class DepNode(var id: Int,
   def reform_for_nx(): Unit = {
     val dict = collect_nodes().map(x => x.id -> x).toMap
     val subCoo = dict.find {
-      case (nid, node) if node.postag == "nx" && node.deprel == "COO" =>
+      case (nid, node) if hanlp.isNounPosTag(node.postag) && node.deprel == "COO" =>
         dict.get(nid - 1).exists(_.word == "､") &&
-          dict.get(nid - 2).exists(x => x.postag == "nx" && x.children.find(_.id == nid).empty)
+          dict.get(nid - 2).exists(x => hanlp.isNounPosTag(x.postag) && x.children.find(_.id == nid).empty)
       case _ => false
     }.map(_._2)
 
