@@ -54,10 +54,19 @@ case class DepNode(var id: Int,
     me
   }
 
-  def addChild(c: DepNode): DepNode = {
-    children = c :: children
-    c.parent = Some(this)
-    this
+  def addChild(c: DepNode): Boolean = {
+    if (ancestors.exists(_.id == c.id)) {
+      false
+    } else {
+      c.detach()
+      children = c :: children.filterNot(_.id == c.id)
+      c.parent = this.some
+      true
+    }
+  }
+
+  def addChildren(cs: Seq[DepNode]): Boolean = {
+    cs.map(addChild).forall(_==true)
   }
 
   def removeChild(id: Int): DepNode = {
@@ -89,7 +98,11 @@ case class DepNode(var id: Int,
     removeCC(this).headOption
   }
 
-  def deepCopy: DepNode = copyWithChildren(children.map(_.deepCopy))
+  def deepCopy: DepNode = {
+    val x = copyWithChildren(children.map(_.deepCopy))
+    x.parent = None
+    x
+  }
 
   def de: Option[DepNode] = {
     children.find {
@@ -325,10 +338,9 @@ case class DepNode(var id: Int,
       Some(copyWithChildren(children.flatMap(_.reform)))
   }
 
-  def detachFromParent(): Unit = {
-    for (p <- parent) {
-      p.children = p.children.filterNot(_.id == id)
-    }
+  def detach(): Unit = {
+    parent.foreach(_.removeChild(id))
+    parent = None
   }
 
   /// 合并相邻的NX(英文单词)
@@ -348,13 +360,13 @@ case class DepNode(var id: Int,
           p.children = p.children.filterNot(_.id == n.id)
           val newWord = p.word + " " + n.word
           if (p.ancestors.exists(_.id == n.id)) {
-            p.detachFromParent()
+            p.detach()
             n.word = newWord
-            p.children.foreach(n.addChild)
+            n.addChildren(p.children)
           } else {
-            n.detachFromParent()
+            n.detach()
             p.word = newWord
-            n.children.foreach(p.addChild)
+            p.addChildren(n.children)
           }
           root._correctParent()
           root.compactId()
@@ -370,7 +382,7 @@ case class DepNode(var id: Int,
     }
   }
 
-  def reform_for_nx():Unit = {
+  def reform_for_nx(): Unit = {
     val dict = collect_nodes().map(x => x.id -> x).toMap
     val subCoo = dict.find {
       case (nid, node) if node.postag == "nx" && node.deprel == "COO" =>
@@ -382,17 +394,14 @@ case class DepNode(var id: Int,
     for (n <- subCoo) {
       for (p <- dict.get(n.id - 2)) {
         if (p.ancestors.exists(_.id == n.id)) {
-          p.detachFromParent()
           n.addChild(p)
         } else {
-          n.detachFromParent()
           p.addChild(n)
         }
         reform_for_nx()
       }
     }
   }
-
 }
 
 object DepNode {
@@ -453,5 +462,4 @@ object DepNode {
         tails.map(x :: _)
       }
   }
-
 }

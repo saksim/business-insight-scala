@@ -32,8 +32,8 @@ object Main {
     //    "熟练各种办公软件操作",
     //    "具有较强的分析能力和项目管理能力"
 //        "熟练运用主流的移动端JS库和开发框架,例如:JQUERY MOBILE､ANGULAR､REACTJS､BOOTSTRAP等"
-//    "具备一定的数据分析能力,如DATA MINING、TEXT MINING、NATURAL LANGUAGE PROCESSING、SENTENCE SYNTHESIZING 等"
-        "熟悉AIX､SOLARIS､LINUX任一操作系统"
+    "具备一定的数据分析能力,如DATA MINING、TEXT MINING、NATURAL LANGUAGE PROCESSING、SENTENCE SYNTHESIZING 等"
+//        "熟悉AIX､SOLARIS､LINUX任一操作系统"
     //    "熟悉发动机开发流程及工作原理"
   ).zipWithIndex.map {
     case (text, index) =>
@@ -46,15 +46,15 @@ object Main {
 
     //    println(HanLP.extractPhrase("具有较强的分析能力和项目管理能力", 5))
 
-    val slices = cutIntoSlice((100L, 1000L), 100L)
-//    slices.map { case (beg, end) =>
+    val slices = cutIntoSlice((100L, 200L), 100L)
+    slices.map { case (beg, end) =>
       //      val f = getReqItem(beg, end).flatMap(sinkAbility)
-//      val f = getReqItem(beg, end).map(_.map(abilitiesOf))
-            val f = Future { basicItems.map(abilitiesOf) }
+      val f = getReqItem(beg, end).map(_.map(abilitiesOf))
+//            val f = Future { basicItems.map(abilitiesOf) }
       val insertCount = Await.result(f, Duration.Inf)
       println(insertCount)
       insertCount
-//    }
+    }
   }
 
 }
