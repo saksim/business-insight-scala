@@ -49,9 +49,10 @@ package object ability {
     val regular = new TrimPriority with RemoveHeadCC
     val roots = regular.execute(item.item).flatMap(HanLPDepParser.parse)
 
-    for (elem <- roots) {
-      elem.show()
-    }
+//    for (elem <- roots) {
+//      elem.show()
+//    }
+
 
     val branches = roots.flatMap(_.split_coo())
 

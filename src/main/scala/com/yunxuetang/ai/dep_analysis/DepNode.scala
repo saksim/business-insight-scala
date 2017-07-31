@@ -49,8 +49,8 @@ case class DepNode(var id: Int,
 
   def copyWithChildren(newChildren: List[DepNode]): DepNode = {
     val me = copy(children = newChildren)
-    for (c <- children) {
-      c.parent = Some(this)
+    for (c <- me.children) {
+      c.parent = Some(me)
     }
     me
   }
@@ -149,10 +149,11 @@ case class DepNode(var id: Int,
     joinWord(words)
   }
 
-  def show(shiftCount: Int = 0): Unit = {
-    printf("%s%2d:%3s  [%4s]  %s\n", " " * shiftCount, id, deprel, postag, word)
+  def show(shiftCount: Int = 0, traceToken: String = ""): Unit = {
+    printf(s"%s%2d:%3s  [%4s]  %s%s ${parent.map(_.id)}\n", " " * shiftCount, id, deprel, postag, word, traceToken)
     for (child <- children) {
-      child.show(shiftCount = shiftCount + 8)
+      val err = if (child.parent.map(_.id).getOrElse(-1) != id) "*" else ""
+      child.show(shiftCount = shiftCount + 8, err)
     }
   }
 
@@ -325,12 +326,13 @@ case class DepNode(var id: Int,
 
   private def split_multi_vob: Seq[DepNode] = {
     val vobs = children.filter(_.deprel == "VOB")
-    for (elem <- vobs) {
-      elem.detach()
+    for (x <- vobs) {
+      x.detach()
     }
-    vobs.map { x =>
+
+    for (x <- vobs) yield {
       val cp = deepCopy
-      cp.addChild(x)
+      cp.addChild(x.deepCopy)
       cp
     }
   }
@@ -450,8 +452,7 @@ object DepNode {
     val nodes2 = nodes.zip(attrSeq).map { case (node, attrs) =>
       nodes.find(_.id == attrs("parent")) match {
         case Some(p) =>
-          node.parent = Some(p)
-          p.children = node :: p.children
+          p.addChild(node)
         case None =>
           node.parent = None
       }

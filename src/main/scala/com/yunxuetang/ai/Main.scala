@@ -45,13 +45,14 @@ object Main {
     //    "熟悉MICROSOFT OFFICE系列"
     //    "有团队合作精神"
     //    "熟悉大数据处理架构"
-//    "对大数据技术体系､关键技术､发展趋势有深刻的理解和认识"
-//    "能够独立搭建LINUX开发环境,如MYSQL、PHP、APACHE等常用软件"
-//    "团队打造能力､沟通能力､良好的执行力及职业化素养"
-//    "熟练使用SEO优化各种工具和技术"
-//    "阅读和理解能力强"
-//    "熟悉掌握C､C++语言编程"
-    "具备JAVA WEB､数据库开发基础者优先"
+    //    "对大数据技术体系､关键技术､发展趋势有深刻的理解和认识"
+    //    "能够独立搭建LINUX开发环境,如MYSQL、PHP、APACHE等常用软件"
+    "少精通一门编程语言,如JAVA、C++或PYTHON"
+    //    "团队打造能力､沟通能力､良好的执行力及职业化素养"
+    //    "熟练使用SEO优化各种工具和技术"
+    //    "阅读和理解能力强"
+    //    "熟悉掌握C､C++语言编程"
+    //    "具备JAVA WEB､数据库开发基础者优先"
   ).zipWithIndex.map {
     case (text, index) =>
       val id = index.toLong + 1L
@@ -59,17 +60,17 @@ object Main {
   }.map(abilitiesOf)
 
   def procDb(): Unit = {
-    val slices = cutIntoSlice((0L, 3000L), 100L)
+    val slices = cutIntoSlice((0L, 3000000L), 100L)
     slices.map { case (beg, end) =>
-      //val f = getReqItem(beg, end).flatMap(sinkAbility)
-      val f = getReqItem(beg, end).map(_.map(abilitiesOf))
+      val f = getReqItem(beg, end).flatMap(sinkAbility)
+      //      val f = getReqItem(beg, end).map(_.map(abilitiesOf))
       Await.result(f, Duration.Inf)
     }
   }
 
   def printItems(): Unit = {
     val slices = cutIntoSlice((0L, 3000000L), 10000L)
-    slices.map { case (beg, end) =>
+    for ((beg, end) <- slices) {
       val f = getReqItem(beg, end).map(_.map(_.item))
       for (item <- Await.result(f, Duration.Inf)) {
         println(item)
@@ -81,8 +82,8 @@ object Main {
   def main(args: Array[String]): Unit = {
     loadCustomDictionary()
     //    printItems()
-//        procDb()
-    showAbilities()
+        procDb()
+//    showAbilities()
   }
 
 }

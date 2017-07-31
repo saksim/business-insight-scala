@@ -22,8 +22,8 @@ package object hanlp {
   }
 
 
-  def isNounPosTag(tag: String) = tag(0) == 'n'
+  def isNounPosTag(tag: String):Boolean = tag(0) == 'n'
 
-  def isVerbPosTag(tag: String) = tag(0) == 'v'
+  def isVerbPosTag(tag: String):Boolean = tag(0) == 'v'
 
 }
