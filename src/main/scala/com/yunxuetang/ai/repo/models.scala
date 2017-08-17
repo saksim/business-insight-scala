@@ -26,7 +26,7 @@ class JobReqItems(tag: Tag) extends Table[JobReqItem](tag, "job_requirement_item
 object jobReqItemTable extends TableQuery(new JobReqItems(_)) {}
 
 /// ==== JOB_ABILITY ====
-case class JobAbility(id: Option[Long], item_id: Long, job_id: Long, entity: String, text_level: String, ability: String, int_level: Long)
+case class JobAbility(id: Option[Long], item_id: Long, job_id: Long, entity: String, text_level: String, ability: String = "", int_level: Long = -1)
 
 class JobAbilities(tag: Tag) extends Table[JobAbility](tag, "job_ability") {
 
