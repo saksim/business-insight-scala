@@ -150,7 +150,7 @@ case class DepNode(var id: Int,
   }
 
   def show(shiftCount: Int = 0, traceToken: String = ""): Unit = {
-    printf(s"%s%2d:%3s  [%4s]  %s%s ${parent.map(_.id)}\n", " " * shiftCount, id, deprel, postag, word, traceToken)
+    printf(s"%s%2d:%3s  [%4s]  %s%s\n", " " * shiftCount, id, deprel, postag, word, traceToken)
     for (child <- children) {
       val err = if (child.parent.map(_.id).getOrElse(-1) != id) "*" else ""
       child.show(shiftCount = shiftCount + 8, err)
@@ -309,7 +309,8 @@ case class DepNode(var id: Int,
         (p.deprel, p.postag, postag) match {
           case (_, _, ptag) if isNounPosTag(ptag) => true
           case (_, _, "vyou") => true
-          case _ => false
+          case _ =>
+            false
         }
       }
     case _ =>
@@ -326,14 +327,15 @@ case class DepNode(var id: Int,
 
   private def split_multi_vob: Seq[DepNode] = {
     val vobs = children.filter(_.deprel == "VOB")
-    for (x <- vobs) {
-      x.detach()
-    }
-
-    for (x <- vobs) yield {
-      val cp = deepCopy
-      cp.addChild(x.deepCopy)
-      cp
+    if (vobs.empty) {
+      Seq(deepCopy)
+    } else {
+      vobs.foreach(_.detach())
+      for (x <- vobs) yield {
+        val cp = deepCopy
+        cp.addChild(x.deepCopy)
+        cp
+      }
     }
   }
 

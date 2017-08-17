@@ -6,8 +6,15 @@ import scala.io.Source
 
 package object hanlp {
 
-  def loadCustomDictionary(): Unit = {
-    val dict = ClassLoader.getSystemResource("yunxuetang.dict")
+  def loadCustomDictionaries(): Unit = {
+    val dicts = Seq("yunxuetang.dict", "ability.dict")
+    for (d <- dicts) {
+      loadCustomDictionary(d)
+    }
+  }
+
+  def loadCustomDictionary(dictFile: String): Unit = {
+    val dict = ClassLoader.getSystemResource(dictFile)
     for (line <- Source.fromURL(dict).getLines()) {
       line.split(" +") match {
         case Array(word, postag, freq) =>
@@ -21,9 +28,8 @@ package object hanlp {
     }
   }
 
+  def isNounPosTag(tag: String): Boolean = tag(0) == 'n'
 
-  def isNounPosTag(tag: String):Boolean = tag(0) == 'n'
-
-  def isVerbPosTag(tag: String):Boolean = tag(0) == 'v'
+  def isVerbPosTag(tag: String): Boolean = tag(0) == 'v'
 
 }

@@ -28,8 +28,8 @@ package object ability {
     "例如"
   )
 
-  def isGeneralAbility(node:DepNode) :Boolean = {
-    node.collect_nodes().filter(_.deprel == "ATT").forall {n => GeneralAbilitiesSet.contains(n.word) }
+  def isGeneralAbility(node: DepNode): Boolean = {
+    node.collect_nodes().filter(_.deprel == "ATT").forall { n => GeneralAbilitiesSet.contains(n.word) }
   }
 
   def abilityOf(item: JobReqItem, tree: DepNode): Option[JobAbility] = {
@@ -49,16 +49,14 @@ package object ability {
     val regular = new TrimPriority with RemoveHeadCC
     val roots = regular.execute(item.item).flatMap(HanLPDepParser.parse)
 
-//    for (elem <- roots) {
-//      elem.show()
-//    }
-
+    for (elem <- roots) {
+      elem.show()
+    }
 
     val branches = roots.flatMap(_.split_coo())
-
-//    for (elem <- branches) {
-//      elem.show()
-//    }
+    //    for (elem <- branches) {
+    //      elem.show()
+    //    }
 
     val abilities = branches.flatMap(abilityOf(item, _)).filterNot(_.entity.endsWith("例如"))
     showAbilities(item, abilities)
@@ -70,7 +68,7 @@ package object ability {
     for (ab <- abilities) {
       println(s"\t\t${ab.entity}:${ab.level}")
     }
-    println("-"*120)
+    println("-" * 120)
   }
 
 
