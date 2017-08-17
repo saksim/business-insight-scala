@@ -12,7 +12,7 @@ import com.yunxuetang.ai.repo.{JobReqItem, db, jobAbilityTable}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scalaz.Scalaz._
-import com.yunxuetang.ai.hanlp.loadCustomDictionary
+import com.yunxuetang.ai.hanlp.loadCustomDictionaries
 
 object Main {
 
@@ -81,7 +81,7 @@ object Main {
   }
 
   def main(args: Array[String]): Unit = {
-    loadCustomDictionary()
+    loadCustomDictionaries()
     //    printItems()
         procDb()
 //    showAbilities()
