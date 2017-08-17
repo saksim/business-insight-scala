@@ -41,7 +41,7 @@ package object ability {
         item_id = item.id.get,
         job_id = item.job_id,
         entity = entity,
-        level = level
+        text_level = level
       )
   }
 
@@ -66,7 +66,7 @@ package object ability {
   def showAbilities(item: JobReqItem, abilities: Seq[JobAbility]): Unit = {
     println(s"[${item.id.get}]${item.item}")
     for (ab <- abilities) {
-      println(s"\t\t${ab.entity}:${ab.level}")
+      println(s"\t\t${ab.entity}:${ab.text_level}")
     }
     println("-" * 120)
   }

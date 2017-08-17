@@ -26,7 +26,7 @@ class JobReqItems(tag: Tag) extends Table[JobReqItem](tag, "job_requirement_item
 object jobReqItemTable extends TableQuery(new JobReqItems(_)) {}
 
 /// ==== JOB_ABILITY ====
-case class JobAbility(id: Option[Long], item_id: Long, job_id: Long, entity: String, level: String)
+case class JobAbility(id: Option[Long], item_id: Long, job_id: Long, entity: String, text_level: String, ability: String, int_level: Long)
 
 class JobAbilities(tag: Tag) extends Table[JobAbility](tag, "job_ability") {
 
@@ -38,9 +38,13 @@ class JobAbilities(tag: Tag) extends Table[JobAbility](tag, "job_ability") {
 
   def entity = column[String]("entity", O.SqlType("varchar(400)"))
 
-  def level = column[String]("level", O.SqlType("varchar(400)"))
+  def text_level = column[String]("text_level", O.SqlType("varchar(400)"))
 
-  def * = (id.?, item_id, job_id, entity, level) <> (JobAbility.tupled, JobAbility.unapply)
+  def ability = column[String]("ability", O.SqlType("varchar(400)"))
+
+  def int_level = column[Long]("int_level", O.SqlType("int(11)"))
+
+  def * = (id.?, item_id, job_id, entity, text_level, ability, int_level) <> (JobAbility.tupled, JobAbility.unapply)
 
 }
 

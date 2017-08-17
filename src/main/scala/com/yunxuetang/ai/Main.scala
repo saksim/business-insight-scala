@@ -53,7 +53,9 @@ object Main {
     //    "阅读和理解能力强"
     //    "熟悉掌握C､C++语言编程"
     //    "具备JAVA WEB､数据库开发基础者优先"
-    "良好的沟通技巧和团队合作精神"
+//    "良好的沟通技巧和团队合作精神"
+//    "具有创意策划力",
+    "懂得肉食品冷藏存放技术"
   ).zipWithIndex.map {
     case (text, index) =>
       val id = index.toLong + 1L
@@ -61,16 +63,16 @@ object Main {
   }.map(abilitiesOf)
 
   def procDb(): Unit = {
-    val slices = cutIntoSlice((0L, 3000000L), 100L)
+    val slices = cutIntoSlice((11042661L, 11042661L+3000000L), 100L)
     slices.map { case (beg, end) =>
       val f = getReqItem(beg, end).flatMap(sinkAbility)
-      //      val f = getReqItem(beg, end).map(_.map(abilitiesOf))
+//      val f = getReqItem(beg, end).map(_.map(abilitiesOf))
       Await.result(f, Duration.Inf)
     }
   }
 
   def printItems(): Unit = {
-    val slices = cutIntoSlice((0L, 1000L), 100L)
+    val slices = cutIntoSlice((11042661L, 11042661L+1000L), 100L)
     for ((beg, end) <- slices) {
       val f = getReqItem(beg, end).map(_.map(_.item))
       for (item <- Await.result(f, Duration.Inf)) {
@@ -82,7 +84,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     loadCustomDictionaries()
-    //    printItems()
+//        printItems()
         procDb()
 //    showAbilities()
   }
