@@ -117,26 +117,26 @@ object Slick {
 
 object SlickTest {
 
-  import scala.concurrent.Await
-  import scala.concurrent.duration.Duration
-
-  def main(args: Array[String]): Unit = {
-    val db = Database.forConfig("octopus")
-
-    val insert0 = jobAbilityTable.insertOrUpdate(JobAbility(None, 1L, 1L, "ab", "le"))
-    val f0 = db.run(insert0)
-    Await.result(f0, Duration.Inf)
-
-
-    val insert = jobAbilityTable.insertOrUpdate(JobAbility(Some(1), 2L, 2L, "ab", "le"))
-    val f = db.run(insert)
-    Await.result(f, Duration.Inf)
-
-
-    println((jobAbilityTable returning jobAbilityTable.map(_.id)).insertStatement)
-    println(jobAbilityTable.updateStatement)
-
-
-  }
+//  import scala.concurrent.Await
+//  import scala.concurrent.duration.Duration
+//
+//  def main(args: Array[String]): Unit = {
+//    val db = Database.forConfig("octopus")
+//
+//    val insert0 = jobAbilityTable.insertOrUpdate(JobAbility(None, 1L, 1L, "ab", "le"))
+//    val f0 = db.run(insert0)
+//    Await.result(f0, Duration.Inf)
+//
+//
+//    val insert = jobAbilityTable.insertOrUpdate(JobAbility(Some(1), 2L, 2L, "ab", "le"))
+//    val f = db.run(insert)
+//    Await.result(f, Duration.Inf)
+//
+//
+//    println((jobAbilityTable returning jobAbilityTable.map(_.id)).insertStatement)
+//    println(jobAbilityTable.updateStatement)
+//
+//
+//  }
 
 }

@@ -63,7 +63,7 @@ object Main {
   }.map(abilitiesOf)
 
   def procDb(): Unit = {
-    val slices = cutIntoSlice((11042661L, 11042661L+3000000L), 100L)
+    val slices = cutIntoSlice((11042661L, 22879873L), 100L)
     slices.map { case (beg, end) =>
       val f = getReqItem(beg, end).flatMap(sinkAbility)
 //      val f = getReqItem(beg, end).map(_.map(abilitiesOf))
