@@ -12,7 +12,7 @@ package object algo {
 
     @tailrec
     def _cutIntoSlice(r: Slice, acc: List[Slice]): List[Slice] = r match {
-      case (begin, end) if begin >= end => acc
+      case (begin, end) if begin >= end => acc.reverse
       case (begin, end) =>
         val newEnd = min(end, begin + sliceLen)
         val slice = (begin, newEnd)
