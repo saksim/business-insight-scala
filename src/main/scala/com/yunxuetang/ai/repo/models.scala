@@ -26,7 +26,8 @@ class JobReqItems(tag: Tag) extends Table[JobReqItem](tag, "job_requirement_item
 object jobReqItemTable extends TableQuery(new JobReqItems(_)) {}
 
 /// ==== JOB_ABILITY ====
-case class JobAbility(id: Option[Long], item_id: Long, job_id: Long, entity: String, text_level: String, ability: String = "", int_level: Long = -1)
+case class JobAbility(id: Option[Long], item_id: Long, job_id: Long, entity: String, text_level: String,
+                      concrete_ability: String = "", ability: String = "", int_level: Long = -1)
 
 class JobAbilities(tag: Tag) extends Table[JobAbility](tag, "job_ability") {
 
@@ -40,11 +41,14 @@ class JobAbilities(tag: Tag) extends Table[JobAbility](tag, "job_ability") {
 
   def text_level = column[String]("text_level", O.SqlType("varchar(400)"))
 
+  def concrete_ability = column[String]("concrete_ability", O.SqlType("varchar(400)"))
+
   def ability = column[String]("ability", O.SqlType("varchar(400)"))
 
   def int_level = column[Long]("int_level", O.SqlType("int(11)"))
 
-  def * = (id.?, item_id, job_id, entity, text_level, ability, int_level) <> (JobAbility.tupled, JobAbility.unapply)
+  def * = (id.?, item_id, job_id, entity, text_level, concrete_ability, ability, int_level) <> (JobAbility.tupled,
+    JobAbility.unapply)
 
 }
 
@@ -117,26 +121,26 @@ object Slick {
 
 object SlickTest {
 
-//  import scala.concurrent.Await
-//  import scala.concurrent.duration.Duration
-//
-//  def main(args: Array[String]): Unit = {
-//    val db = Database.forConfig("octopus")
-//
-//    val insert0 = jobAbilityTable.insertOrUpdate(JobAbility(None, 1L, 1L, "ab", "le"))
-//    val f0 = db.run(insert0)
-//    Await.result(f0, Duration.Inf)
-//
-//
-//    val insert = jobAbilityTable.insertOrUpdate(JobAbility(Some(1), 2L, 2L, "ab", "le"))
-//    val f = db.run(insert)
-//    Await.result(f, Duration.Inf)
-//
-//
-//    println((jobAbilityTable returning jobAbilityTable.map(_.id)).insertStatement)
-//    println(jobAbilityTable.updateStatement)
-//
-//
-//  }
+  //  import scala.concurrent.Await
+  //  import scala.concurrent.duration.Duration
+  //
+  //  def main(args: Array[String]): Unit = {
+  //    val db = Database.forConfig("octopus")
+  //
+  //    val insert0 = jobAbilityTable.insertOrUpdate(JobAbility(None, 1L, 1L, "ab", "le"))
+  //    val f0 = db.run(insert0)
+  //    Await.result(f0, Duration.Inf)
+  //
+  //
+  //    val insert = jobAbilityTable.insertOrUpdate(JobAbility(Some(1), 2L, 2L, "ab", "le"))
+  //    val f = db.run(insert)
+  //    Await.result(f, Duration.Inf)
+  //
+  //
+  //    println((jobAbilityTable returning jobAbilityTable.map(_.id)).insertStatement)
+  //    println(jobAbilityTable.updateStatement)
+  //
+  //
+  //  }
 
 }
