@@ -217,7 +217,10 @@ case class DepNode(var id: Int,
 
   def level: Option[String] = {
     if (isSbvVob) {
-      "符合".some
+      Seq(
+        children.find(_.deprel == "ADV").map(_.toString),
+        "符合".some
+      ).flatten.headOption
     } else if (isVOB) {
       reform_for_vob_level.map(_.toString)
     } else if (isNoun) {
@@ -231,7 +234,7 @@ case class DepNode(var id: Int,
       reform_for_cmp_level.map(_.toString)
     } else {
       "none".some
-//      None
+      //      None
     }
   }
 
