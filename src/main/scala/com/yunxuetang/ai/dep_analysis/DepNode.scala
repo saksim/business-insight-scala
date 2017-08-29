@@ -75,6 +75,15 @@ case class DepNode(var id: Int,
     this
   }
 
+  def dropInvalid: Option[DepNode] = {
+    val sentence = toString
+    if (sentence.endsWith("的")) {
+      None
+    } else {
+      this.some
+    }
+  }
+
   def trimRedundantCC: Option[DepNode] = {
     val allIds = collect_nodes().map(_.id).toSet
 
@@ -326,7 +335,8 @@ case class DepNode(var id: Int,
     for {
       branch <- split_multi_vob
       coo <- branch._split()
-      x <- coo.trimRedundantCC
+      coo1 <- coo.trimRedundantCC
+      x <- coo1.dropInvalid
     } yield x
   }
 
