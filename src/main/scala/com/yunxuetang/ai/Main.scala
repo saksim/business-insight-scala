@@ -87,8 +87,8 @@ object Main {
   def main(args: Array[String]): Unit = {
     loadCustomDictionaries()
 //    printItems()
-    procDb()
-//    showAbilities()
+//    procDb()
+    showAbilities()
   }
 
 }
