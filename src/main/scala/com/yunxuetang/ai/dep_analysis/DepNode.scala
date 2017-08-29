@@ -169,7 +169,8 @@ case class DepNode(var id: Int,
     } else if (isCMP) {
       reform_for_cmp_subject.map(_.toString)
     } else {
-      None
+      //      None
+      toString.some
     }
   }
 
@@ -229,7 +230,8 @@ case class DepNode(var id: Int,
     } else if (isCMP) {
       reform_for_cmp_level.map(_.toString)
     } else {
-      None
+      "none".some
+//      None
     }
   }
 
