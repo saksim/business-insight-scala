@@ -67,13 +67,13 @@ object Main {
   }.map(abilitiesOf)
 
   @tailrec
-  def group3(spans: Seq[(Long, Long)], acc: List[Seq[(Long, Long)]] = Nil): List[Seq[(Long, Long)]] = {
-    if (spans.size <= 3) {
+  def group4(spans: Seq[(Long, Long)], acc: List[Seq[(Long, Long)]] = Nil): List[Seq[(Long, Long)]] = {
+    if (spans.size <= 4) {
       val newAcc = spans :: acc
       newAcc.reverse
     } else {
-      val segment = spans.take(3)
-      group3(spans.drop(3), segment :: acc)
+      val segment = spans.take(4)
+      group3(spans.drop(4), segment :: acc)
     }
   }
 
@@ -86,8 +86,8 @@ object Main {
   }
 
   def procDb(): Unit = {
-    val slices = cutIntoSlice((1L, 9579541L), 100L)
-    val groupSlices = group3(slices)
+    val slices = cutIntoSlice((1L, 9579541L), 200L)
+    val groupSlices = group4(slices)
     //    val parSlices = ParSeq(slices :_*)
     for (group <- groupSlices) {
       val parSpan = ParSeq(group: _*)
