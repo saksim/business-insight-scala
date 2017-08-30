@@ -9,6 +9,7 @@ import com.yunxuetang.ai.ability.abilitiesOf
 import com.yunxuetang.ai.algo.cutIntoSlice
 import com.yunxuetang.ai.repo.Slick.getReqItem
 import com.yunxuetang.ai.repo.{JobReqItem, db, jobAbilityTable}
+import scala.collection.parallel.ParSeq
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -66,7 +67,8 @@ object Main {
 
   def procDb(): Unit = {
     val slices = cutIntoSlice((1L, 1000L), 100L)
-    slices.map { case (beg, end) =>
+    val parSlices = ParSeq(slices :_*)
+    parSlices.map { case (beg, end) =>
       val f = getReqItem(beg, end).flatMap(sinkAbility)
       //      val f = getReqItem(beg, end).map(_.map(abilitiesOf))
       Await.result(f, Duration.Inf)
