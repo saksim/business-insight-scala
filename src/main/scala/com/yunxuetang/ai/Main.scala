@@ -73,7 +73,7 @@ object Main {
       newAcc.reverse
     } else {
       val segment = spans.take(4)
-      group3(spans.drop(4), segment :: acc)
+      group4(spans.drop(4), segment :: acc)
     }
   }
 
