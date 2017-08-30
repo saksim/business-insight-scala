@@ -65,14 +65,39 @@ object Main {
       JobReqItem(id = id.some, job_id = id, item = text)
   }.map(abilitiesOf)
 
-  def procDb(): Unit = {
-    val slices = cutIntoSlice((1L, 9579541L), 100L)
-    val parSlices = ParSeq(slices :_*)
-    parSlices.map { case (beg, end) =>
+  def group3(spans: Seq[(Long, Long)]): List[Seq[(Long, Long)]] = {
+    if (spans.size <= 3) {
+      List(spans)
+    } else {
+      val segment = spans.take(3)
+      segment :: group3(spans.drop(3))
+    }
+  }
+
+  def procSpan(span: (Long, Long)): Unit = span match {
+    case (beg, end) =>
       val f = getReqItem(beg, end).flatMap(sinkAbility)
       //      val f = getReqItem(beg, end).map(_.map(abilitiesOf))
       Await.result(f, Duration.Inf)
+
+  }
+
+  def procDb(): Unit = {
+    val slices = cutIntoSlice((1L, 9579541L), 100L)
+    val groupSlices = group3(slices)
+    print(groupSlices)
+    //    val parSlices = ParSeq(slices :_*)
+    for (group <- groupSlices) {
+      val parSpan = ParSeq(group :_*)
+      parSpan.map(procSpan)
+
     }
+
+//    groupSlices.map { case (beg, end) =>
+//      val f = getReqItem(beg, end).flatMap(sinkAbility)
+//      //      val f = getReqItem(beg, end).map(_.map(abilitiesOf))
+//      Await.result(f, Duration.Inf)
+//    }
   }
 
   def printItems(): Unit = {
@@ -88,9 +113,9 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     loadCustomDictionaries()
-//    printItems()
+    //    printItems()
     procDb()
-//    showAbilities()
+    //    showAbilities()
   }
 
 }
