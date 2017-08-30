@@ -72,8 +72,8 @@ object Main {
       val newAcc = spans :: acc
       newAcc.reverse
     } else {
-      val segment = spans.take(4)
-      group4(spans.drop(4), segment :: acc)
+      val segment = spans.take(3)
+      group4(spans.drop(3), segment :: acc)
     }
   }
 
@@ -86,7 +86,7 @@ object Main {
   }
 
   def procDb(): Unit = {
-    val slices = cutIntoSlice((1L, 9579541L), 200L)
+    val slices = cutIntoSlice((1L, 9579541L), 100L)
     val groupSlices = group4(slices)
     //    val parSlices = ParSeq(slices :_*)
     for (group <- groupSlices) {
