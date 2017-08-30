@@ -2,6 +2,7 @@ package com.yunxuetang.ai
 
 import java.util.concurrent.Executors
 
+import scala.annotation.tailrec
 import com.hankcs.hanlp.HanLP
 import com.hankcs.hanlp.dictionary.CustomDictionary
 import com.hankcs.hanlp.seg.Viterbi.ViterbiSegment
@@ -65,12 +66,14 @@ object Main {
       JobReqItem(id = id.some, job_id = id, item = text)
   }.map(abilitiesOf)
 
-  def group3(spans: Seq[(Long, Long)]): List[Seq[(Long, Long)]] = {
+  @tailrec
+  def group3(spans: Seq[(Long, Long)], acc: List[Seq[(Long, Long)]] = Nil): List[Seq[(Long, Long)]] = {
     if (spans.size <= 3) {
-      List(spans)
+      val newAcc = spans :: acc
+      newAcc.reverse
     } else {
       val segment = spans.take(3)
-      segment :: group3(spans.drop(3))
+      group3(spans.drop(3), segment :: acc)
     }
   }
 
@@ -85,19 +88,17 @@ object Main {
   def procDb(): Unit = {
     val slices = cutIntoSlice((1L, 9579541L), 100L)
     val groupSlices = group3(slices)
-    print(groupSlices)
     //    val parSlices = ParSeq(slices :_*)
     for (group <- groupSlices) {
-      val parSpan = ParSeq(group :_*)
+      val parSpan = ParSeq(group: _*)
       parSpan.map(procSpan)
-
     }
 
-//    groupSlices.map { case (beg, end) =>
-//      val f = getReqItem(beg, end).flatMap(sinkAbility)
-//      //      val f = getReqItem(beg, end).map(_.map(abilitiesOf))
-//      Await.result(f, Duration.Inf)
-//    }
+    //    groupSlices.map { case (beg, end) =>
+    //      val f = getReqItem(beg, end).flatMap(sinkAbility)
+    //      //      val f = getReqItem(beg, end).map(_.map(abilitiesOf))
+    //      Await.result(f, Duration.Inf)
+    //    }
   }
 
   def printItems(): Unit = {
