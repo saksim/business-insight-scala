@@ -59,7 +59,8 @@ object Main {
     //    "良好的沟通技巧和团队合作精神"
     //    "具有创意策划力",
     //    "懂得肉食品冷藏存放技术"
-    "发现并解决问题的能力"
+    //    "发现并解决问题的能力"
+    "分析与解决问题的能力"
   ).zipWithIndex.map {
     case (text, index) =>
       val id = index.toLong + 1L
@@ -115,8 +116,8 @@ object Main {
   def main(args: Array[String]): Unit = {
     loadCustomDictionaries()
     //    printItems()
-    procDb()
     //    showAbilities()
+    procDb()
   }
 
 }

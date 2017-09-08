@@ -7,7 +7,8 @@ import scala.io.Source
 package object hanlp {
 
   def loadCustomDictionaries(): Unit = {
-    val dicts = Seq("yunxuetang.dict", "ability.dict")
+//    val dicts = Seq("yunxuetang.dict", "ability.dict")
+    val dicts = Seq("yunxuetang.dict")
     for (d <- dicts) {
       loadCustomDictionary(d)
     }

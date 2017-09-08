@@ -29,7 +29,7 @@ object jobReqItemTable extends TableQuery(new JobReqItems(_)) {}
 case class JobAbility(id: Option[Long], item_id: Long, job_id: Long, entity: String, text_level: String,
                       concrete_ability: String = "", ability: String = "", int_level: Long = -1)
 
-class JobAbilities(tag: Tag) extends Table[JobAbility](tag, "job_ability2") {
+class JobAbilities(tag: Tag) extends Table[JobAbility](tag, "job_ability") {
 
   def id = column[Long]("id", O.PrimaryKey, O.SqlType("int(11)"), O.AutoInc)
 
@@ -71,7 +71,7 @@ case class JobDetail(id: Option[Long],
                      fetchedAt: Date,
                      requirementExtracted: Int)
 
-class JobDetails(tag: Tag) extends Table[JobDetail](tag, "job_detail") {
+class JobDetails(tag: Tag) extends Table[JobDetail](tag, "job_detail2") {
 
   def id = column[Long]("id", O.PrimaryKey, O.SqlType("int(11)"), O.AutoInc)
 
