@@ -338,7 +338,8 @@ case class DepNode(var id: Int,
         true
       } else {
         (p.deprel, p.postag, postag) match {
-          case (_, _, ptag) if isNounPosTag(ptag) => true
+          case (_, "nz", _) => false
+          case (_, _, tag) if tag == "n" => true
           case (_, _, "vyou") => true
           case _ =>
             false
