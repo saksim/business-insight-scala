@@ -47,13 +47,13 @@ package object ability {
 
   def abilitiesOf(item: JobReqItem): Seq[JobAbility] = {
     val regular = new TrimPriority with RemoveHeadCC
-    val roots = regular.execute(item.item).flatMap(HanLPDepParser.parse)
+    val roots = regular.execute(item.item).flatMap(HanLPDepParser.parse).map(_.borrowWordCooClause)
 
     for (elem <- roots) {
       elem.show()
     }
 
-    val branches = roots.flatMap(_.split_coo())
+    val branches = roots.flatMap(_.splitCOO())
     //    for (elem <- branches) {
     //      elem.show()
     //    }

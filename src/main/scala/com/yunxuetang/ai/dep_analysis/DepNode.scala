@@ -5,6 +5,7 @@ import com.yunxuetang.ai.ability.NonBranchClauseBeginWords
 import com.yunxuetang.ai.{ability, hanlp}
 import com.yunxuetang.ai.hanlp.isNounPosTag
 
+import scala.annotation.tailrec
 import scalaz.Scalaz._
 
 case class DepNode(var id: Int,
@@ -305,6 +306,22 @@ case class DepNode(var id: Int,
 
   def isVerb: Boolean = hanlp.isVerbPosTag(postag)
 
+
+  def borrowWordCooClause: DepNode = {
+    children.filter(_.isSplitableCoo) match {
+      case Seq(branch) if branch.contain_coo_words =>
+        val me = branch.deepCopy
+        me.deprel = deprel
+        for (x <- me.findById(id + 2)) {
+          x.word = word
+        }
+        me.addChildren(children.map(_.deepCopy))
+        me
+      case _ =>
+        copyWithChildren(children.map(_.borrowWordCooClause))
+    }
+  }
+
   def isSplitableCoo: Boolean = (parent, deprel) match {
     case (Some(p), "COO") =>
       if (postag == "nx" && p.deprel == "HED") {
@@ -331,7 +348,17 @@ case class DepNode(var id: Int,
       false
   }
 
-  def split_coo(): Seq[DepNode] = {
+  def contain_coo_words: Boolean = (deprel, parent) match {
+    case ("COO", Some(p)) =>
+      findById(p.id + 2) match {
+        case None => false
+        case Some(n) =>
+          n.postag == postag
+      }
+    case _ => false
+  }
+
+  def splitCOO(): Seq[DepNode] = {
     for {
       branch <- split_multi_vob
       coo <- branch._split()
