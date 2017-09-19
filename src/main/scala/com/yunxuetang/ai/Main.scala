@@ -117,7 +117,7 @@ object Main {
   }
 
   def main(args: Array[String]): Unit = {
-    loadCustomDictionaries()
+//    loadCustomDictionaries()
     //    printItems()
     //    showAbilities()
     procDb()
