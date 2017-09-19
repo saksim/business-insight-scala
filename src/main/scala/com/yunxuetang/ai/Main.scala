@@ -69,13 +69,15 @@ object Main {
   }.map(abilitiesOf)
 
   @tailrec
-  def group4(spans: Seq[(Long, Long)], acc: List[Seq[(Long, Long)]] = Nil): List[Seq[(Long, Long)]] = {
-    if (spans.size <= 4) {
+  def group_n(spans: Seq[(Long, Long)],
+              acc: List[Seq[(Long, Long)]] = Nil,
+              spanLen: Int = 4): List[Seq[(Long, Long)]] = {
+    if (spans.size <= spanLen) {
       val newAcc = spans :: acc
       newAcc.reverse
     } else {
-      val segment = spans.take(3)
-      group4(spans.drop(3), segment :: acc)
+      val segment = spans.take(spanLen)
+      group_n(spans.drop(spanLen), segment :: acc, spanLen)
     }
   }
 
@@ -89,7 +91,7 @@ object Main {
 
   def procDb(): Unit = {
     val slices = cutIntoSlice((1L, 44546L), 100L)
-    val groupSlices = group4(slices)
+    val groupSlices = group_n(slices, Nil, 1)
     //    val parSlices = ParSeq(slices :_*)
     for (group <- groupSlices) {
       val parSpan = ParSeq(group: _*)
@@ -117,8 +119,8 @@ object Main {
   def main(args: Array[String]): Unit = {
     loadCustomDictionaries()
     //    printItems()
-//    showAbilities()
-        procDb()
+    //    showAbilities()
+    procDb()
   }
 
 }
