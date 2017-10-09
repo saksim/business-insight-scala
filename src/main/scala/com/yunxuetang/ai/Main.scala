@@ -61,7 +61,13 @@ object Main {
     //    "懂得肉食品冷藏存放技术"
     //    "发现并解决问题的能力"
     //    "分析与解决问题的能力"
-    "具备良好的信贷和财务分析能力"
+    //    "具备良好的信贷和财务分析能力"
+    //    "具备一定的市场分析及判断能力"
+    //    "善于语言表达及沟通"
+    //    "分析和解决问题的能力"
+//    "具备良好的沟通表达及应变能力"
+//    "对程序､美术､界面体验有一定理解领悟能力"
+    "熟悉ANDROID平台游戏开发流程标准"
   ).zipWithIndex.map {
     case (text, index) =>
       val id = index.toLong + 1L
@@ -90,7 +96,7 @@ object Main {
   }
 
   def procDb(): Unit = {
-    val slices = cutIntoSlice((1L, 44546L), 100L)
+    val slices = cutIntoSlice((1L, 45778910L), 100L)
     val groupSlices = group_n(slices, Nil, 1)
     //    val parSlices = ParSeq(slices :_*)
     for (group <- groupSlices) {
@@ -117,10 +123,10 @@ object Main {
   }
 
   def main(args: Array[String]): Unit = {
-//    loadCustomDictionaries()
+    //    loadCustomDictionaries()
     //    printItems()
-    //    showAbilities()
-    procDb()
+//    showAbilities()
+        procDb()
   }
 
 }
