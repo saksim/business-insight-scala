@@ -57,8 +57,13 @@ package object ability {
     //    for (elem <- branches) {
     //      elem.show()
     //    }
+    val bs  = if (branches.size > 2) {
+      roots
+    } else {
+      branches
+    }
 
-    val abilities = branches.flatMap(abilityOf(item, _)).filterNot(_.entity.endsWith("例如"))
+    val abilities = bs.flatMap(abilityOf(item, _)).filterNot(_.entity.endsWith("例如"))
     showAbilities(item, abilities)
     abilities
   }
