@@ -96,8 +96,8 @@ object Main {
   }
 
   def procDb(): Unit = {
-    val slices = cutIntoSlice((1L, 5778910L), 100L)
-    val groupSlices = group_n(slices, Nil, 3)
+    val slices = cutIntoSlice((1L, 5778910L), 300L)
+    val groupSlices = group_n(slices, Nil, 1)
     //    val parSlices = ParSeq(slices :_*)
     for (group <- groupSlices) {
       val parSpan = ParSeq(group: _*)
